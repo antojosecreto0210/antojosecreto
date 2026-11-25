@@ -368,57 +368,14 @@
                     Lo que dicen quienes ya confiaron en nosotros
                 </h2>
                 <div class="w-20 h-1 bg-brand-gold mx-auto rounded-full"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-brand-dark/90 border border-brand-gold/30 p-8 rounded-2xl relative shadow-xl">
-                    <div class="flex text-brand-gold text-sm mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm italic leading-relaxed mb-6">
-                        "Pedí el Kit Skincare Spa y el vino artesanal abocado para el cumpleaños de mi hermana y quedó encantada. La presentación y la atención por WhatsApp fueron impecables."
-                    </p>
-                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-brand-wine flex items-center justify-center font-bold text-brand-gold text-sm">CR</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Camila Rodríguez</h4>
-                            <span class="text-xs text-gray-400">Compra verificada</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-brand-dark/90 border border-brand-gold/30 p-8 rounded-2xl relative shadow-xl">
-                    <div class="flex text-brand-gold text-sm mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm italic leading-relaxed mb-6">
-                        "Me encantaron los sets de aretes góticos y las medias con diseño de vaquita. Todo llegó súper rápido, bien empacado y exactamente igual a las fotos. ¡Súper recomendados!"
-                    </p>
-                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-brand-wine flex items-center justify-center font-bold text-brand-gold text-sm">VM</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Valentina Morales</h4>
-                            <span class="text-xs text-gray-400">Compra verificada</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-brand-dark/90 border border-brand-gold/30 p-8 rounded-2xl relative shadow-xl">
-                    <div class="flex text-brand-gold text-sm mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm italic leading-relaxed mb-6">
-                        "Compré el intercomunicador Q58-Max para mi casco y las toallitas Urban. Excelente calidad, súper prácticos y precios muy justos. Sin duda volveré a pedir."
-                    </p>
-                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-brand-wine flex items-center justify-center font-bold text-brand-gold text-sm">AG</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Andrés Gómez</h4>
-                            <span class="text-xs text-gray-400">Compra verificada</span>
-                        </div>
-                    </div>
+                <div id="reviews-admin-bar" class="hidden mt-5 justify-center">
+                    <button type="button" onclick="openReviewModal()" class="px-4 py-2 rounded-xl gold-gradient-btn text-brand-black text-xs font-bold uppercase tracking-wider shadow flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Agregar Opinión
+                    </button>
                 </div>
             </div>
+
+            <div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
         </div>
     </section>
 
@@ -636,6 +593,57 @@
     </div>
 
     <!-- ==========================================
+         MODAL PARA AGREGAR / EDITAR OPINIONES
+    =========================================== -->
+    <div id="review-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-brand-gold/40">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-5">
+                <h3 id="review-modal-title" class="font-serif text-xl font-bold text-brand-black">Editar Opinión</h3>
+                <button type="button" onclick="closeReviewModal()" aria-label="Cerrar ventana de opinión" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="review-form" onsubmit="saveReview(event)" class="space-y-4">
+                <input type="hidden" id="rev-id">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nombre del Cliente *</label>
+                    <input type="text" id="rev-name" required placeholder="Ej. Camila Rodríguez"
+                        class="w-full px-4 py-2.5 rounded-xl bg-brand-cream border border-gray-200 focus:border-brand-gold outline-none text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Etiqueta *</label>
+                        <input type="text" id="rev-tag" required placeholder="Ej. Compra verificada"
+                            class="w-full px-4 py-2.5 rounded-xl bg-brand-cream border border-gray-200 focus:border-brand-gold outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Calificación *</label>
+                        <select id="rev-stars" class="w-full px-4 py-2.5 rounded-xl bg-brand-cream border border-gray-200 focus:border-brand-gold outline-none text-sm">
+                            <option value="5">5 Estrellas (★★★★★)</option>
+                            <option value="4">4 Estrellas (★★★★☆)</option>
+                            <option value="3">3 Estrellas (★★★☆☆)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Testimonio o Comentario *</label>
+                    <textarea id="rev-quote" rows="3" required placeholder="Escribe lo que opinó el cliente..."
+                        class="w-full px-4 py-2.5 rounded-xl bg-brand-cream border border-gray-200 focus:border-brand-gold outline-none text-sm"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                    <button type="button" onclick="closeReviewModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold uppercase">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl gold-gradient-btn text-brand-black text-xs font-bold uppercase shadow">Guardar Opinión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
          LÓGICA DE CATÁLOGO Y PERSISTENCIA REAL
     =========================================== -->
     <script>
@@ -643,6 +651,178 @@
         const WHATSAPP_NUMBER = "573052942120";
         const ADMIN_SECRET_KEY = "antojo2026";
         const STORAGE_KEY = "antojo_secreto_catalogo_v1";
+        const REVIEWS_STORAGE_KEY = "antojo_secreto_opiniones_v1";
+
+        const defaultReviews = [
+            {
+                id: "rev_1",
+                name: "Camila Rodríguez",
+                tag: "Compra verificada",
+                stars: 5,
+                quote: "Pedí el Kit Skincare Spa y el vino artesanal abocado para el cumpleaños de mi hermana y quedó encantada. La presentación y la atención por WhatsApp fueron impecables."
+            },
+            {
+                id: "rev_2",
+                name: "Valentina Morales",
+                tag: "Compra verificada",
+                stars: 5,
+                quote: "Me encantaron los sets de aretes góticos y las medias con diseño de vaquita. Todo llegó súper rápido, bien empacado y exactamente igual a las fotos. ¡Súper recomendados!"
+            },
+            {
+                id: "rev_3",
+                name: "Andrés Gómez",
+                tag: "Compra verificada",
+                stars: 5,
+                quote: "Compré el intercomunicador Q58-Max para mi casco y las toallitas Urban. Excelente calidad, súper prácticos y precios muy justos. Sin duda volveré a pedir."
+            }
+        ];
+
+        let reviews = [];
+
+        function getInitials(name) {
+            const parts = String(name || "AS").trim().split(/\s+/).filter(Boolean);
+            if (parts.length === 0) return "AS";
+            if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function loadReviews() {
+            try {
+                const raw = localStorage.getItem(REVIEWS_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        reviews = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("No se pudieron cargar opiniones guardadas:", e);
+            }
+            reviews = JSON.parse(JSON.stringify(defaultReviews));
+            saveReviewsToStorage();
+        }
+
+        function saveReviewsToStorage() {
+            try {
+                localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
+            } catch (e) {
+                console.warn("No se pudieron guardar las opiniones:", e);
+            }
+        }
+
+        function renderReviews() {
+            const grid = document.getElementById('reviews-grid');
+            const adminBar = document.getElementById('reviews-admin-bar');
+            if (!grid) return;
+
+            if (adminBar) {
+                adminBar.classList.toggle('hidden', !isAdminMode);
+                adminBar.classList.toggle('flex', isAdminMode);
+            }
+
+            grid.innerHTML = reviews.map((rev) => {
+                const starCount = Math.min(5, Math.max(1, Number(rev.stars) || 5));
+                const starsHtml = Array.from({ length: 5 }, (_, i) =>
+                    `<i class="${i < starCount ? 'fas' : 'far'} fa-star"></i>`
+                ).join('');
+
+                const reviewAdminControls = isAdminMode ? `
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="openReviewModal('${rev.id}')" title="Editar opinión" class="px-2.5 py-1 rounded-lg bg-brand-black border border-brand-gold/60 text-brand-gold hover:bg-brand-gold hover:text-brand-black text-[11px] font-bold transition-colors">
+                            <i class="fas fa-pen mr-1"></i>Editar
+                        </button>
+                        <button type="button" onclick="deleteReview('${rev.id}')" title="Eliminar opinión" class="w-7 h-7 rounded-lg bg-brand-wine/90 hover:bg-red-700 text-white flex items-center justify-center text-xs transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="bg-brand-dark/90 border border-brand-gold/30 p-8 rounded-2xl relative shadow-xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-4">
+                                <div class="flex text-brand-gold text-sm gap-1">
+                                    ${starsHtml}
+                                </div>
+                                ${reviewAdminControls}
+                            </div>
+                            <p class="text-gray-300 text-sm italic leading-relaxed mb-6">
+                                "${rev.quote}"
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-wine flex items-center justify-center font-bold text-brand-gold text-sm shrink-0">${getInitials(rev.name)}</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">${rev.name}</h4>
+                                <span class="text-xs text-gray-400">${rev.tag || 'Compra verificada'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openReviewModal(id = null) {
+            const modal = document.getElementById('review-modal');
+            const title = document.getElementById('review-modal-title');
+            const form = document.getElementById('review-form');
+            if (!modal || !form) return;
+
+            form.reset();
+            if (id) {
+                const rev = reviews.find(r => String(r.id) === String(id));
+                if (!rev) return;
+                if (title) title.textContent = 'Editar Opinión';
+                document.getElementById('rev-id').value = rev.id;
+                document.getElementById('rev-name').value = rev.name || '';
+                document.getElementById('rev-tag').value = rev.tag || 'Compra verificada';
+                document.getElementById('rev-stars').value = String(rev.stars || 5);
+                document.getElementById('rev-quote').value = rev.quote || '';
+            } else {
+                if (title) title.textContent = 'Agregar Nueva Opinión';
+                document.getElementById('rev-id').value = '';
+                document.getElementById('rev-tag').value = 'Compra verificada';
+                document.getElementById('rev-stars').value = '5';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById('review-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveReview(event) {
+            event.preventDefault();
+            const idVal = document.getElementById('rev-id').value;
+            const name = document.getElementById('rev-name').value.trim();
+            const tag = document.getElementById('rev-tag').value.trim() || 'Compra verificada';
+            const stars = Math.min(5, Math.max(1, Number(document.getElementById('rev-stars').value) || 5));
+            const quote = document.getElementById('rev-quote').value.trim();
+
+            if (!name || !quote) return;
+
+            const reviewId = idVal || `rev_${Date.now()}`;
+            const payload = { id: reviewId, name, tag, stars, quote };
+
+            const idx = reviews.findIndex(r => String(r.id) === String(reviewId));
+            if (idx !== -1) reviews[idx] = payload;
+            else reviews.unshift(payload);
+
+            saveReviewsToStorage();
+            renderReviews();
+            closeReviewModal();
+            showToast('Opinión guardada correctamente.');
+        }
+
+        function deleteReview(id) {
+            reviews = reviews.filter(r => String(r.id) !== String(id));
+            saveReviewsToStorage();
+            renderReviews();
+            showToast('Opinión eliminada.');
+        }
 
         // Generador de ilustraciones vectoriales nítidas 1:1 para cada producto
         function makeProdArt(bg1, bg2, accent, emoji, badge, sub) {
@@ -1063,6 +1243,7 @@
                 toggleBtn.classList.remove('flex');
             }
             renderProducts();
+            renderReviews();
         }
 
         function toggleAdminMode() {
@@ -1356,15 +1537,23 @@
 
         function resetDefaultProducts() {
             products = JSON.parse(JSON.stringify(defaultProducts));
+            reviews = JSON.parse(JSON.stringify(defaultReviews));
             saveCatalogToStorage();
+            saveReviewsToStorage();
             updateCategoryCounts();
             renderProducts();
-            showToast('Catálogo original restaurado');
+            renderReviews();
+            showToast('Catálogo y opiniones originales restaurados');
         }
 
         function exportCatalogJSON() {
             try {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
+                const payload = {
+                    version: 2,
+                    products,
+                    reviews
+                };
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
                 const dlAnchor = document.createElement('a');
                 dlAnchor.setAttribute("href", dataStr);
                 dlAnchor.setAttribute("download", "respaldo_antojo_secreto.json");
@@ -1389,9 +1578,22 @@
                         saveCatalogToStorage();
                         updateCategoryCounts();
                         renderProducts();
-                        showToast('Respaldo importado y catálogo actualizado.');
+                        showToast('Respaldo de productos importado correctamente.');
+                    } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.products)) {
+                        if (parsed.products.length > 0) {
+                            products = parsed.products;
+                            saveCatalogToStorage();
+                            updateCategoryCounts();
+                            renderProducts();
+                        }
+                        if (Array.isArray(parsed.reviews)) {
+                            reviews = parsed.reviews;
+                            saveReviewsToStorage();
+                            renderReviews();
+                        }
+                        showToast('Respaldo completo importado correctamente.');
                     } else {
-                        showToast('El archivo de respaldo no contiene productos válidos.');
+                        showToast('El archivo de respaldo no contiene datos válidos.');
                     }
                 } catch (err) {
                     console.error("Error al importar JSON:", err);
@@ -1438,8 +1640,10 @@
 
         // Arrancar tienda
         loadCatalog();
+        loadReviews();
         updateCategoryCounts();
         renderProducts();
+        renderReviews();
     </script>
 </body>
 </html>

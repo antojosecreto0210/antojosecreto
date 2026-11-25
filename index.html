@@ -834,48 +834,26 @@
             showToast('Opinión eliminada.');
         }
 
-        // Generador de respaldo visual local en canvas compatible con todos los dispositivos
+        // Generador único de identidad visual compatible con vista previa y todos los dispositivos
         function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = 600;
-                canvas.height = 600;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return '';
+            const c1 = encodeURIComponent(String(bg1 || '#181818'));
+            const c2 = encodeURIComponent(String(bg2 || '#0D0D0D'));
+            const ac = encodeURIComponent(String(accent || '#D4AF37'));
+            const sym = encodeURIComponent(String(symbolText || 'TOP').slice(0, 8));
+            const bd = encodeURIComponent(String(badge || 'ANTOJO SECRETO').slice(0, 28));
+            const sb = encodeURIComponent(String(sub || 'DETALLE ESPECIAL').slice(0, 34));
 
-                const grad = ctx.createLinearGradient(0, 0, 600, 600);
-                grad.addColorStop(0, bg1 || '#181818');
-                grad.addColorStop(1, bg2 || '#0D0D0D');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 600, 600);
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">` +
+                `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${decodeURIComponent(c1)}"/><stop offset="100%" stop-color="${decodeURIComponent(c2)}"/></linearGradient></defs>` +
+                `<rect width="600" height="600" fill="url(#g)"/>` +
+                `<rect x="26" y="26" width="548" height="548" rx="18" fill="none" stroke="${decodeURIComponent(ac)}" stroke-opacity="0.45" stroke-width="4"/>` +
+                `<circle cx="300" cy="255" r="120" fill="${decodeURIComponent(ac)}" fill-opacity="0.15"/>` +
+                `<text x="300" y="120" text-anchor="middle" fill="${decodeURIComponent(ac)}" font-family="Montserrat, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="2">${decodeURIComponent(bd)}</text>` +
+                `<text x="300" y="275" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="56" font-weight="800">${decodeURIComponent(sym)}</text>` +
+                `<text x="300" y="445" text-anchor="middle" fill="#F3F4F6" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="1">${decodeURIComponent(sb)}</text>` +
+                `</svg>`;
 
-                const glow = ctx.createRadialGradient(300, 260, 20, 300, 260, 260);
-                glow.addColorStop(0, (accent || '#D4AF37') + '55');
-                glow.addColorStop(1, 'transparent');
-                ctx.fillStyle = glow;
-                ctx.fillRect(0, 0, 600, 600);
-
-                ctx.strokeStyle = (accent || '#D4AF37') + '88';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(26, 26, 548, 548);
-
-                ctx.fillStyle = accent || '#D4AF37';
-                ctx.font = 'bold 20px Montserrat, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(String(badge || 'ANTOJO SECRETO').slice(0, 28), 300, 125);
-
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 64px Montserrat, sans-serif';
-                ctx.fillText(String(symbolText || 'TOP').slice(0, 8), 300, 315);
-
-                ctx.fillStyle = '#E5E7EB';
-                ctx.font = '600 18px Montserrat, sans-serif';
-                ctx.fillText(String(sub || 'DETALLE ESPECIAL').slice(0, 34), 300, 445);
-
-                return canvas.toDataURL('image/png');
-            } catch (e) {
-                return '';
-            }
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
 
         // Catálogo inicial con los 25 productos de Antojo Secreto e imágenes integradas
@@ -1087,108 +1065,50 @@
                 name: "Libros para Colorear Anti-Estrés",
                 category: "Anti-Estrés y Juegos",
                 price: "$10.000 c/u",
-                {
-                    id: "prod_24",
-                    order: 24,
-                    name: "Squeeze Desestresantes Kawaii",
-                    category: "Anti-Estrés y Juegos",
-                    price: "Desde $2.000 hasta $12.000",
-                    desc: "Suavecitos, estirables y divertidos. Ideales para apretar y liberar tensión en el estudio, oficina o como detalle tierno.",
-                    image: makeProdArt("#831843", "#2E071B", "#F9A8D4", "SQUISH", "SQUEEZE KAWAII", "SUAVES Y ANTI-ESTRÉS")
-                },
-                {
-                    id: "prod_25",
-                    order: 25,
-                    name: "Mini Blocks Armables (Edición Halloween)",
-                    category: "Anti-Estrés y Juegos",
-                    price: "$8.000 c/u",
-                    desc: "Bloques de construcción tipo Lego (90 a 225 piezas) para armar figuras coleccionables (Fantasma, Calabaza, Casa Mágica).",
-                    image: makeProdArt("#311042", "#12051A", "#FB923C", "MINI", "MINI BLOCKS COLECCIÓN", "90 A 225 PIEZAS • ARMABLES")
-                }
-            ];
-
-        // Generador local de identidad visual por producto (sin depender de servicios externos)
-        function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
-            return JSON.stringify({
-                __localArt: true,
-                bg1: String(bg1 || "#181818"),
-                bg2: String(bg2 || "#0D0D0D"),
-                accent: String(accent || "#D4AF37"),
-                symbol: String(symbolText || "TOP").slice(0, 8),
-                badge: String(badge || "ANTOJO SECRETO").slice(0, 28),
-                sub: String(sub || "DETALLE ESPECIAL").slice(0, 34)
-            });
-        }
-
-        function parseLocalArt(src) {
-            if (typeof src !== "string") return null;
-            if (!src.trim().startsWith("{")) return null;
-            try {
-                const parsed = JSON.parse(src);
-                if (parsed && parsed.__localArt) return parsed;
-            } catch (e) {
-                return null;
+                desc: "Desconéctate de la rutina, estimula tu creatividad y relaja tu mente con ilustraciones únicas para trazar y colorear.",
+                image: makeProdArt("#311042", "#12051A", "#FBBF24", "ART", "LIBROS ANTI-ESTRÉS", "LINE ART & WEIRD • RELAJANTE")
+            },
+            {
+                id: "prod_23",
+                order: 23,
+                name: "Spinner Esfera Transformable Anti-Estrés",
+                category: "Anti-Estrés y Juegos",
+                price: "$10.000 c/u",
+                desc: "Gira, presiona y transforma. Juguete sensorial ideal para mejorar la concentración y liberar tensión en niños y adultos.",
+                image: makeProdArt("#0F766E", "#042F2E", "#5EEAD4", "360", "SPINNER TRANSFORMABLE", "ANTI-ESTRÉS • SENSORIAL")
+            },
+            {
+                id: "prod_24",
+                order: 24,
+                name: "Squeeze Desestresantes Kawaii",
+                category: "Anti-Estrés y Juegos",
+                price: "Desde $2.000 hasta $12.000",
+                desc: "Suavecitos, estirables y divertidos. Ideales para apretar y liberar tensión en el estudio, oficina o como detalle tierno.",
+                image: makeProdArt("#831843", "#2E071B", "#F9A8D4", "SQUISH", "SQUEEZE KAWAII", "SUAVES Y ANTI-ESTRÉS")
+            },
+            {
+                id: "prod_25",
+                order: 25,
+                name: "Mini Blocks Armables (Edición Halloween)",
+                category: "Anti-Estrés y Juegos",
+                price: "$8.000 c/u",
+                desc: "Bloques de construcción tipo Lego (90 a 225 piezas) para armar figuras coleccionables (Fantasma, Calabaza, Casa Mágica).",
+                image: makeProdArt("#311042", "#12051A", "#FB923C", "MINI", "MINI BLOCKS COLECCIÓN", "90 A 225 PIEZAS • ARMABLES")
             }
-            return null;
-        }
+        ];
 
-        function drawProductArtCanvas(canvas, artSpec, fallbackTitle) {
-            if (!canvas) return;
-            const spec = artSpec || {
-                bg1: "#181818",
-                bg2: "#0D0D0D",
-                accent: "#D4AF37",
-                symbol: "TOP",
-                badge: String(fallbackTitle || "ANTOJO SECRETO").slice(0, 24).toUpperCase(),
-                sub: "DETALLE ESPECIAL"
-            };
+        // Generador único de imagen SVG 1:1 compatible con vista previa y cualquier dispositivo
+        function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
+            const c1 = String(bg1 || "#181818");
+            const c2 = String(bg2 || "#0D0D0D");
+            const acc = String(accent || "#D4AF37");
+            const sym = String(symbolText || "TOP").slice(0, 8).replace(/[<>&"]/g, "");
+            const bdg = String(badge || "ANTOJO SECRETO").slice(0, 26).replace(/[<>&"]/g, "");
+            const s = String(sub || "DETALLE ESPECIAL").slice(0, 32).replace(/[<>&"]/g, "");
 
-            const size = 600;
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><rect width="600" height="600" fill="url(#g)"/><rect x="26" y="26" width="548" height="548" rx="28" fill="none" stroke="${acc}" stroke-opacity="0.45" stroke-width="4"/><circle cx="300" cy="255" r="120" fill="${acc}" fill-opacity="0.14"/><text x="300" y="125" text-anchor="middle" fill="${acc}" font-family="Montserrat,Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="2">${bdg}</text><text x="300" y="275" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat,Arial,sans-serif" font-size="56" font-weight="800">${sym}</text><text x="300" y="455" text-anchor="middle" fill="#F3F4F6" font-family="Montserrat,Arial,sans-serif" font-size="18" font-weight="600">${s}</text></svg>`;
 
-            const grad = ctx.createLinearGradient(0, 0, size, size);
-            grad.addColorStop(0, spec.bg1 || "#181818");
-            grad.addColorStop(1, spec.bg2 || "#0D0D0D");
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, size, size);
-
-            ctx.strokeStyle = spec.accent || "#D4AF37";
-            ctx.globalAlpha = 0.35;
-            ctx.lineWidth = 4;
-            ctx.strokeRect(26, 26, size - 52, size - 52);
-
-            ctx.beginPath();
-            ctx.arc(size / 2, size * 0.43, 125, 0, Math.PI * 2);
-            ctx.fillStyle = spec.accent || "#D4AF37";
-            ctx.globalAlpha = 0.14;
-            ctx.fill();
-
-            ctx.globalAlpha = 1;
-            ctx.fillStyle = spec.accent || "#D4AF37";
-            ctx.font = "bold 54px Montserrat, sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(spec.symbol || "TOP", size / 2, size * 0.43);
-
-            ctx.fillStyle = "#FFFFFF";
-            ctx.font = "bold 28px Playfair Display, serif";
-            ctx.fillText(spec.badge || "ANTOJO SECRETO", size / 2, size * 0.67);
-
-            ctx.fillStyle = "#E5E7EB";
-            ctx.font = "600 17px Montserrat, sans-serif";
-            ctx.fillText(spec.sub || "DETALLE ESPECIAL", size / 2, size * 0.74);
-        }
-
-        function hydrateAllProductCanvases() {
-            document.querySelectorAll("canvas[data-art-payload]").forEach((canvas) => {
-                const raw = canvas.getAttribute("data-art-payload") || "";
-                const spec = parseLocalArt(raw);
-                const title = canvas.getAttribute("data-prod-title") || "Antojo Secreto";
-                drawProductArtCanvas(canvas, spec, title);
-            });
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
         }
 
         function getProductImages(prod) {
@@ -1438,11 +1358,8 @@
                 const imgs = getProductImages(prod);
                 const currentIdx = (activeSlideIndex[prod.id] || 0) % imgs.length;
                 const activeImgSrc = imgs[currentIdx];
-                const localArtSpec = parseLocalArt(activeImgSrc);
                 const safeTitleAttr = String(prod.name || "Producto").replace(/"/g, "&quot;");
-                const mediaMarkup = localArtSpec
-                    ? `<canvas id="img-${prod.id}" data-art-payload="${activeImgSrc.replace(/"/g, "&quot;")}" data-prod-title="${safeTitleAttr}" aria-label="${safeTitleAttr}"></canvas>`
-                    : `<img id="img-${prod.id}" src="${activeImgSrc}" alt="${safeTitleAttr}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.style.display='none';">`;
+                const mediaMarkup = `<img id="img-${prod.id}" src="${activeImgSrc}" alt="${safeTitleAttr}" referrerpolicy="no-referrer">`;
 
                 const waText = encodeURIComponent(`Hola Antojo Secreto, me interesa el producto: *${prod.name}* (${prod.price}). ¿Tienen disponibilidad?`);
                 const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${waText}`;
@@ -1506,8 +1423,6 @@
                     </article>
                 `;
             }).join('');
-
-            hydrateAllProductCanvases();
         }
 
         function changeSlide(prodId, step) {

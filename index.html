@@ -309,6 +309,9 @@
                         <i class="fas fa-upload mr-1"></i> Importar
                         <input type="file" accept=".json,application/json" onchange="importCatalogJSON(event)" class="hidden">
                     </label>
+                    <button type="button" onclick="downloadUpdatedHTML()" class="px-3 py-2.5 rounded-xl border border-brand-gold/60 bg-white text-brand-black hover:bg-brand-gold/10 text-xs font-bold" title="Descargar index.html con tu catálogo y fotos integrados para subir a GitHub">
+                        <i class="fas fa-file-code mr-1"></i> Bajar HTML
+                    </button>
                     <button type="button" onclick="resetDefaultProducts()" class="px-3 py-2.5 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100 text-xs font-medium" title="Restaurar catálogo original">
                         <i class="fas fa-rotate-left"></i>
                     </button>
@@ -825,7 +828,12 @@
         }
 
         // Generador de ilustraciones vectoriales nítidas 1:1 para cada producto
-        function makeProdArt(bg1, bg2, accent, emoji, badge, sub) {
+        function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
+            // Se evita el símbolo '&' dentro del SVG para mantener el XML limpio en cualquier navegador móvil/escritorio
+            const cleanBadge = String(badge || "ANTOJO SECRETO").replace(/&/g, "Y");
+            const cleanSub = String(sub || "DETALLE ESPECIAL").replace(/&/g, "Y");
+            const cleanSymbol = String(symbolText || "★").replace(/&/g, "Y");
+
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
                 <defs>
                     <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -840,9 +848,10 @@
                 <rect width="600" height="600" fill="url(#g)"/>
                 <circle cx="300" cy="270" r="220" fill="url(#glow)"/>
                 <rect x="28" y="28" width="544" height="544" rx="36" fill="none" stroke="${accent}" stroke-opacity="0.45" stroke-width="3"/>
-                <text x="300" y="245" text-anchor="middle" font-size="130">${emoji}</text>
-                <text x="300" y="365" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="2">${badge}</text>
-                <text x="300" y="410" text-anchor="middle" fill="${accent}" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="1.5">${sub}</text>
+                <circle cx="300" cy="215" r="78" fill="#0D0D0D" fill-opacity="0.45" stroke="${accent}" stroke-width="2.5"/>
+                <text x="300" y="242" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="68" font-weight="800">${cleanSymbol}</text>
+                <text x="300" y="365" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="2">${cleanBadge}</text>
+                <text x="300" y="410" text-anchor="middle" fill="${accent}" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="1.5">${cleanSub}</text>
                 <text x="300" y="515" text-anchor="middle" fill="#F3D06B" font-family="Georgia, serif" font-style="italic" font-size="22">Antojo Secreto</text>
             </svg>`;
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
@@ -857,10 +866,10 @@
                 category: "Licores y Especiales",
                 price: "$16.000 c/u",
                 desc: "Vino dulce, suave y delicioso, elaborado 100% de forma artesanal. El acompañante ideal para celebraciones, cenas románticas o regalos inolvidables.",
-                image: makeProdArt("#4D0913", "#1A0307", "#F3D06B", "🍷", "VINO ARTESANAL", "100% DULCE & SUAVE"),
+                image: makeProdArt("#4D0913", "#1A0307", "#F3D06B", "WINE", "VINO ARTESANAL", "100% DULCE Y SUAVE"),
                 images: [
-                    makeProdArt("#4D0913", "#1A0307", "#F3D06B", "🍷", "VINO ARTESANAL", "100% DULCE & SUAVE"),
-                    makeProdArt("#2B050B", "#0D0D0D", "#E5B84B", "🥂", "EDICIÓN ESPECIAL", "DETALLE PARA REGALO")
+                    makeProdArt("#4D0913", "#1A0307", "#F3D06B", "WINE", "VINO ARTESANAL", "100% DULCE Y SUAVE"),
+                    makeProdArt("#2B050B", "#0D0D0D", "#E5B84B", "VIP", "EDICIÓN ESPECIAL", "DETALLE PARA REGALO")
                 ]
             },
             {
@@ -870,10 +879,10 @@
                 category: "Licores y Especiales",
                 price: "$16.000 c/u",
                 desc: "Textura cremosa y sabor irresistible 100% artesanal. Disponible en deliciosos sabores: Maracuyá, Uva, Coco y Café.",
-                image: makeProdArt("#2C1A0E", "#0D0D0D", "#D4AF37", "🥃", "CREMA DE WHISKY", "MARACUYÁ • UVA • COCO • CAFÉ"),
+                image: makeProdArt("#2C1A0E", "#0D0D0D", "#D4AF37", "4X", "CREMA DE WHISKY", "MARACUYÁ • UVA • COCO • CAFÉ"),
                 images: [
-                    makeProdArt("#2C1A0E", "#0D0D0D", "#D4AF37", "🥃", "CREMA DE WHISKY", "MARACUYÁ • UVA • COCO • CAFÉ"),
-                    makeProdArt("#3E2311", "#140A04", "#F3D06B", "☕", "SABORES ARTESANALES", "CREMOSA & DELICIOSA")
+                    makeProdArt("#2C1A0E", "#0D0D0D", "#D4AF37", "4X", "CREMA DE WHISKY", "MARACUYÁ • UVA • COCO • CAFÉ"),
+                    makeProdArt("#3E2311", "#140A04", "#F3D06B", "TOP", "SABORES ARTESANALES", "CREMOSA Y DELICIOSA")
                 ]
             },
             {
@@ -883,7 +892,7 @@
                 category: "Licores y Especiales",
                 price: "$25.000 c/u",
                 desc: "Decora puertas, paredes o locales con tamaño real (90 cm ancho x 210 cm alto). Material resistente, colores vivos y 14 diseños disponibles.",
-                image: makeProdArt("#7A1120", "#143D29", "#F3D06B", "🎅", "DECORACIÓN GIGANTE", "90 CM X 210 CM • 14 DISEÑOS")
+                image: makeProdArt("#7A1120", "#143D29", "#F3D06B", "XL", "DECORACIÓN GIGANTE", "90 CM X 210 CM • 14 DISEÑOS")
             },
             {
                 id: "prod_4",
@@ -892,7 +901,7 @@
                 category: "Skincare y Belleza",
                 price: "$22.000",
                 desc: "Prepárate para tu rutina facial sin mojarte. Incluye balaca suavecita, 2 muñequeras absorbentes, esponjita facial y pinza. Lavable y reutilizable.",
-                image: makeProdArt("#9D3B55", "#3D121E", "#FFD1DC", "🧖‍♀️", "KIT SKINCARE SPA", "BALACA + MUÑEQUERAS + ESPONJA")
+                image: makeProdArt("#9D3B55", "#3D121E", "#FFD1DC", "SPA", "KIT SKINCARE SPA", "BALACA + MUÑEQUERAS + ESPONJA")
             },
             {
                 id: "prod_5",
@@ -901,7 +910,7 @@
                 category: "Skincare y Belleza",
                 price: "$20.000 el kit",
                 desc: "Diadema spa ultra suave + rodillo masajeador facial metálico. Ideal para rutina skincare, maquillaje, masaje relajante y crioterapia.",
-                image: makeProdArt("#78283C", "#240B12", "#F8BBD0", "💆‍♀️", "RUBY FACE KIT", "DIADEMA + RODILLO FACIAL")
+                image: makeProdArt("#78283C", "#240B12", "#F8BBD0", "GLOW", "RUBY FACE KIT", "DIADEMA + RODILLO FACIAL")
             },
             {
                 id: "prod_6",
@@ -910,7 +919,7 @@
                 category: "Skincare y Belleza",
                 price: "$8.000 c/u",
                 desc: "Hidratación profunda y rejuvenecimiento. Elige Rosa Colágeno (suaviza líneas y aporta brillo) u Oro 24K (efecto lifting reafirmante).",
-                image: makeProdArt("#5C4312", "#1A1204", "#F3D06B", "✨", "MASCARILLA HIDROGEL", "ROSA COLÁGENO & ORO 24K")
+                image: makeProdArt("#5C4312", "#1A1204", "#F3D06B", "24K", "MASCARILLA HIDROGEL", "ROSA COLÁGENO Y ORO 24K")
             },
             {
                 id: "prod_7",
@@ -919,7 +928,7 @@
                 category: "Skincare y Belleza",
                 price: "$2.500 c/u | 2 x $4.000",
                 desc: "Tratamiento spa focalizado: Vitamina C (ojeras), Algas Verdes (bolsas), Oro 24K (lifting), Niacinamida (anti-arrugas) e Hidratante de Labios.",
-                image: makeProdArt("#881337", "#2E0613", "#FBCFE8", "💋", "PARCHES OJOS Y LABIOS", "COLÁGENO • VITAMINA C • ORO")
+                image: makeProdArt("#881337", "#2E0613", "#FBCFE8", "CARE", "PARCHES OJOS Y LABIOS", "COLÁGENO • VITAMINA C • ORO")
             },
             {
                 id: "prod_8",
@@ -928,7 +937,7 @@
                 category: "Skincare y Belleza",
                 price: "$5.000 (6 Packs)",
                 desc: "Seca granitos rápido de forma discreta y tierna. Tecnología hidrocoloide que protege tu piel y evita que toques las imperfecciones. Incluye 120 parches.",
-                image: makeProdArt("#831843", "#2B0716", "#FDE047", "⭐", "PARCHES ESTRELLITA", "HIDROCOLOIDE • 120 UNIDADES")
+                image: makeProdArt("#831843", "#2B0716", "#FDE047", "120", "PARCHES ESTRELLITA", "HIDROCOLOIDE • 6 PACKS")
             },
             {
                 id: "prod_9",
@@ -937,7 +946,7 @@
                 category: "Skincare y Belleza",
                 price: "$3.000 c/u",
                 desc: "Hidrata labios secos, suaviza y aporta brillo natural sin sensación grasosa. Deliciosos aromas frutales: Aguacate, Naranja y Arándano.",
-                image: makeProdArt("#14532D", "#072614", "#BEF264", "🥑", "BÁLSAMO LABIAL FRUTAL", "AGUACATE • NARANJA • ARÁNDANO")
+                image: makeProdArt("#14532D", "#072614", "#BEF264", "7G", "BÁLSAMO LABIAL FRUTAL", "AGUACATE • NARANJA • ARÁNDANO")
             },
             {
                 id: "prod_10",
@@ -946,7 +955,7 @@
                 category: "Skincare y Belleza",
                 price: "$4.000 c/u",
                 desc: "Difumina base, corrector y rubor con acabado uniforme. Forma de gota para zonas difíciles, no absorbe producto en exceso e incluye base soporte.",
-                image: makeProdArt("#9D174D", "#330619", "#F9A8D4", "💧", "BEAUTY SPONGE KAWAII", "INCLUYE BASE SOPORTE")
+                image: makeProdArt("#9D174D", "#330619", "#F9A8D4", "1:1", "BEAUTY SPONGE KAWAII", "INCLUYE BASE SOPORTE")
             },
             {
                 id: "prod_11",
@@ -955,10 +964,10 @@
                 category: "Skincare y Belleza",
                 price: "$4.000 c/u | Pack x3 $3.000",
                 desc: "Diseños tiernos y coloridos (frutas, flores o pack de animalitos). Perfectas para dar forma y realizar tu manicure profesional en casa.",
-                image: makeProdArt("#1E3A8A", "#0C183B", "#93C5FD", "💅", "LIMAS DE UÑAS KAWAII", "GRANO 100/180 • DISEÑOS"),
+                image: makeProdArt("#1E3A8A", "#0C183B", "#93C5FD", "NAIL", "LIMAS DE UÑAS KAWAII", "GRANO 100/180 • DISEÑOS"),
                 images: [
-                    makeProdArt("#1E3A8A", "#0C183B", "#93C5FD", "💅", "LIMAS DE UÑAS KAWAII", "GRANO 100/180 • DISEÑOS"),
-                    makeProdArt("#4C1D95", "#1E0B3B", "#DDD6FE", "🐻", "PACK ANIMALITOS X3", "MANICURE EN CASA")
+                    makeProdArt("#1E3A8A", "#0C183B", "#93C5FD", "NAIL", "LIMAS DE UÑAS KAWAII", "GRANO 100/180 • DISEÑOS"),
+                    makeProdArt("#4C1D95", "#1E0B3B", "#DDD6FE", "X3", "PACK ANIMALITOS X3", "MANICURE EN CASA")
                 ]
             },
             {
@@ -968,7 +977,7 @@
                 category: "Skincare y Belleza",
                 price: "$12.000",
                 desc: "Fragancia masculina fresca. Fórmula 100% libre de plástico, alcohol y parabenos. Ideales para el gimnasio, carro, barbería o maleta.",
-                image: makeProdArt("#1F2937", "#090D16", "#FACC15", "🧴", "TOALLITAS URBAN 100", "FRAGANCIA MASCULINA FRESCA")
+                image: makeProdArt("#1F2937", "#090D16", "#FACC15", "100", "TOALLITAS URBAN 100", "FRAGANCIA MASCULINA FRESCA")
             },
             {
                 id: "prod_13",
@@ -977,7 +986,7 @@
                 category: "Bienestar y Tech",
                 price: "$50.000",
                 desc: "Bluetooth Waterproof para moto con reducción inteligente de ruido, radio FM, música compartida, llamadas manos libres y pantalla LED.",
-                image: makeProdArt("#0F172A", "#020617", "#38BDF8", "🎧", "INTERCOM Q58-MAX", "BLUETOOTH WATERPROOF • LED")
+                image: makeProdArt("#0F172A", "#020617", "#38BDF8", "BT", "INTERCOM Q58-MAX", "BLUETOOTH WATERPROOF • LED")
             },
             {
                 id: "prod_14",
@@ -986,7 +995,7 @@
                 category: "Bienestar y Tech",
                 price: "$35.000",
                 desc: "Plegable, recargable y ultra silencioso (30% menos ruido). Pantalla digital con 199 niveles de potencia, ideal para viajes o fijar maquillaje.",
-                image: makeProdArt("#312E81", "#111033", "#A5B4FC", "💨", "VENTILADOR PORTÁTIL", "199 VELOCIDADES • RECARGABLE")
+                image: makeProdArt("#312E81", "#111033", "#A5B4FC", "199", "VENTILADOR PORTÁTIL", "199 VELOCIDADES • RECARGABLE")
             },
             {
                 id: "prod_15",
@@ -995,7 +1004,7 @@
                 category: "Bienestar y Tech",
                 price: "Mini $25.000 | Grande $38.000",
                 desc: "Alivia cólicos, dolores musculares o días fríos. Funda peluchuda suavecita, lavable y recargable con agua caliente.",
-                image: makeProdArt("#5D4037", "#261814", "#FFCCBC", "🧸", "BOLSA TÉRMICA PELUCHE", "ALIVIO CÓLICOS Y FRÍO")
+                image: makeProdArt("#5D4037", "#261814", "#FFCCBC", "HOT", "BOLSA TÉRMICA PELUCHE", "ALIVIO CÓLICOS Y FRÍO")
             },
             {
                 id: "prod_16",
@@ -1004,7 +1013,7 @@
                 category: "Bienestar y Tech",
                 price: "$10.000",
                 desc: "Gel interior reutilizable frío/caliente. Úsalo frío para desinflamar ojeras o caliente para aliviar estrés y dolor de cabeza. Suave y lavable.",
-                image: makeProdArt("#581C87", "#210936", "#E9D5FF", "😴", "ANTIFAZ GEL TÉRMICO", "USO FRÍO Y CALIENTE")
+                image: makeProdArt("#581C87", "#210936", "#E9D5FF", "GEL", "ANTIFAZ GEL TÉRMICO", "USO FRÍO Y CALIENTE")
             },
             {
                 id: "prod_17",
@@ -1013,7 +1022,7 @@
                 category: "Accesorios y Estilo",
                 price: "$4.500 cada set",
                 desc: "Edición tendencia: elige Set de 17 Anillos ajustables o Sets de 6 pares de aretes (diseños de poción, dragón, daga, rosa, araña y Halloween).",
-                image: makeProdArt("#27272A", "#09090B", "#C084FC", "💍", "COLECCIÓN GÓTICA DARK", "ANILLOS Y ARETES TENDENCIA")
+                image: makeProdArt("#27272A", "#09090B", "#C084FC", "DARK", "COLECCIÓN GÓTICA DARK", "ANILLOS Y ARETES TENDENCIA")
             },
             {
                 id: "prod_18",
@@ -1022,7 +1031,7 @@
                 category: "Accesorios y Estilo",
                 price: "$8.000 c/u | 2 por $15.000",
                 desc: "Diseños únicos de vaquitas, ositos y estampados con mucha onda. Suaves, cómodas y perfectas para regalar o darle toque especial a tu outfit.",
-                image: makeProdArt("#451A03", "#1C0A00", "#FDE68A", "🧦", "MEDIAS CON ESTILO", "VAQUITAS • OSITOS • DISEÑOS")
+                image: makeProdArt("#451A03", "#1C0A00", "#FDE68A", "2X15", "MEDIAS CON ESTILO", "VAQUITAS • OSITOS • DISEÑOS")
             },
             {
                 id: "prod_19",
@@ -1031,7 +1040,7 @@
                 category: "Accesorios y Estilo",
                 price: "$15.000 c/u",
                 desc: "Doble espejo práctico + llavero con purpurina en movimiento (shaker). Súper tiernos y cómodos para llevar en tu bolso o llaves.",
-                image: makeProdArt("#86198F", "#2E0733", "#F5D0FE", "🪞", "ESPEJITO SHAKER BRILLO", "DOBLE ESPEJO + LLAVERO")
+                image: makeProdArt("#86198F", "#2E0733", "#F5D0FE", "2X", "ESPEJITO SHAKER BRILLO", "DOBLE ESPEJO + LLAVERO")
             },
             {
                 id: "prod_20",
@@ -1040,7 +1049,7 @@
                 category: "Accesorios y Estilo",
                 price: "Casco $10.000 | 3D $13.000",
                 desc: "Personaliza tus llaves o moto con el exclusivo Casco Mini KMD con visor tornasol ($10.000) o llaveros 3D con correa como Stitch ($13.000).",
-                image: makeProdArt("#1E293B", "#090D16", "#38BDF8", "🏍️", "LLAVEROS BIKER & 3D", "CASCO KMD TORNASOL & STITCH")
+                image: makeProdArt("#1E293B", "#090D16", "#38BDF8", "3D", "LLAVEROS BIKER Y 3D", "CASCO KMD TORNASOL Y STITCH")
             },
             {
                 id: "prod_21",
@@ -1049,7 +1058,7 @@
                 category: "Accesorios y Estilo",
                 price: "$5.000 c/u",
                 desc: "Todo en 1 tarro práctico organizador: incluye cauchos y ganchitos para el cabello en colores surtidos súper lindos.",
-                image: makeProdArt("#9A3412", "#381104", "#FED7AA", "🎀", "TARRITO DE MOÑITAS", "CAUCHOS + GANCHITOS SURTIDOS")
+                image: makeProdArt("#9A3412", "#381104", "#FED7AA", "MIX", "TARRITO DE MOÑITAS", "CAUCHOS + GANCHITOS SURTIDOS")
             },
             {
                 id: "prod_22",
@@ -1058,7 +1067,7 @@
                 category: "Anti-Estrés y Juegos",
                 price: "$10.000 c/u",
                 desc: "Estilos Line Art Tracing y Open at Your Own Risk (+5000 ilustraciones). Relaja tu mente, reduce el estrés y estimula la creatividad.",
-                image: makeProdArt("#1E293B", "#0F172A", "#FBBF24", "🎨", "LIBROS ANTI-ESTRÉS", "LINE ART & +5000 DIBUJOS")
+                image: makeProdArt("#1E293B", "#0F172A", "#FBBF24", "ART", "LIBROS ANTI-ESTRÉS", "LINE ART Y +5000 DIBUJOS")
             },
             {
                 id: "prod_23",
@@ -1067,7 +1076,7 @@
                 category: "Anti-Estrés y Juegos",
                 price: "$10.000 c/u",
                 desc: "Gira, presiona y transforma. Juguete sensorial auto-rotativo ideal para mejorar la concentración y liberar estrés en niños y adultos.",
-                image: makeProdArt("#065F46", "#022C22", "#6EE7B7", "🌀", "SPINNER ESFERA 3D", "GIRA • PRESIONA • TRANSFORMA")
+                image: makeProdArt("#065F46", "#022C22", "#6EE7B7", "360", "SPINNER ESFERA 3D", "GIRA • PRESIONA • TRANSFORMA")
             },
             {
                 id: "prod_24",
@@ -1076,7 +1085,7 @@
                 category: "Anti-Estrés y Juegos",
                 price: "Desde $2.000 hasta $12.000",
                 desc: "Suavecitos, estirables y divertidos. Ideales para apretar y liberar tensión en el estudio, oficina o como detalle tierno.",
-                image: makeProdArt("#6B21A8", "#270940", "#F0ABFC", "🐾", "SQUEEZE KAWAII", "SUAVECITOS & ANTI-ESTRÉS")
+                image: makeProdArt("#6B21A8", "#270940", "#F0ABFC", "SOFT", "SQUEEZE KAWAII", "SUAVECITOS Y ANTI-ESTRÉS")
             },
             {
                 id: "prod_25",
@@ -1085,7 +1094,7 @@
                 category: "Anti-Estrés y Juegos",
                 price: "$8.000 c/u",
                 desc: "Bloques de construcción tipo Lego coleccionables (90 a 225 piezas): Ghost, Pumpkin Snack Box y Magic House. Desarrolla la creatividad (6+ años).",
-                image: makeProdArt("#7C2D12", "#1C0A03", "#FB923C", "🧱", "MINI BLOCKS ARMABLES", "COLECCIÓN HALLOWEEN 6+")
+                image: makeProdArt("#7C2D12", "#1C0A03", "#FB923C", "MINI", "MINI BLOCKS ARMABLES", "COLECCIÓN HALLOWEEN 6+")
             }
         ];
 
@@ -1122,13 +1131,21 @@
         }
 
         function getProductImages(prod) {
+            const validImgs = [];
             if (Array.isArray(prod.images) && prod.images.length > 0) {
-                return prod.images;
+                for (const item of prod.images) {
+                    if (typeof item === 'string' && item.trim().length > 0) {
+                        validImgs.push(item.trim());
+                    }
+                }
             }
-            if (prod.image) {
-                return [prod.image];
+            if (validImgs.length === 0 && typeof prod.image === 'string' && prod.image.trim().length > 0) {
+                validImgs.push(prod.image.trim());
             }
-            return [`https://placehold.co/600x600/181818/D4AF37?text=${encodeURIComponent(prod.name || 'Antojo Secreto')}`];
+            if (validImgs.length === 0) {
+                validImgs.push(makeProdArt("#181818", "#0D0D0D", "#D4AF37", "TOP", (prod.name || "ANTOJO SECRETO").slice(0, 18).toUpperCase(), "DETALLE ESPECIAL"));
+            }
+            return validImgs;
         }
 
         function updateCategoryCounts() {
@@ -1187,7 +1204,7 @@
 
         function copyPageHTML() {
             try {
-                const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                const htmlContent = buildUpdatedHTMLString();
                 const textarea = document.createElement('textarea');
                 textarea.value = htmlContent;
                 document.body.appendChild(textarea);
@@ -1197,6 +1214,45 @@
                 showToast('Código HTML copiado al portapapeles.');
             } catch (e) {
                 showToast('Copia el código directamente desde el editor.');
+            }
+        }
+
+        function buildUpdatedHTMLString() {
+            const clone = document.documentElement.cloneNode(true);
+            // Asegurar que no se exporte el modo admin activado por accidente
+            const toolbar = clone.querySelector('#admin-toolbar');
+            if (toolbar) {
+                toolbar.classList.add('hidden');
+                toolbar.classList.remove('flex');
+            }
+            const adminBtn = clone.querySelector('#toggle-admin-btn');
+            if (adminBtn) {
+                adminBtn.classList.add('hidden');
+                adminBtn.classList.remove('flex');
+            }
+            const revBar = clone.querySelector('#reviews-admin-bar');
+            if (revBar) {
+                revBar.classList.add('hidden');
+                revBar.classList.remove('flex');
+            }
+            return '<!DOCTYPE html>\n' + clone.outerHTML;
+        }
+
+        function downloadUpdatedHTML() {
+            try {
+                const htmlStr = buildUpdatedHTMLString();
+                const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'index.html';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast('Archivo index.html descargado.');
+            } catch (e) {
+                showToast('No se pudo descargar el archivo HTML.');
             }
         }
 

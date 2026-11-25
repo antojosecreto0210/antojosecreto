@@ -846,15 +846,15 @@
                     </radialGradient>
                 </defs>
                 <rect width="600" height="600" fill="url(#g)"/>
-                <circle cx="300" cy="270" r="220" fill="url(#glow)"/>
-                <rect x="28" y="28" width="544" height="544" rx="36" fill="none" stroke="${accent}" stroke-opacity="0.45" stroke-width="3"/>
-                <circle cx="300" cy="215" r="78" fill="#0D0D0D" fill-opacity="0.45" stroke="${accent}" stroke-width="2.5"/>
-                <text x="300" y="242" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="68" font-weight="800">${cleanSymbol}</text>
-                <text x="300" y="365" text-anchor="middle" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="2">${cleanBadge}</text>
-                <text x="300" y="410" text-anchor="middle" fill="${accent}" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="1.5">${cleanSub}</text>
-                <text x="300" y="515" text-anchor="middle" fill="#F3D06B" font-family="Georgia, serif" font-style="italic" font-size="22">Antojo Secreto</text>
-            </svg>`;
-            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        // Generador de respaldo visual compatible con todos los navegadores y dispositivos
+        function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
+            const cleanBg1 = String(bg1 || "181818").replace("#", "").trim();
+            const cleanAccent = String(accent || "D4AF37").replace("#", "").trim();
+            const label = String(badge || symbolText || "ANTOJO SECRETO")
+                .replace(/&/g, "Y")
+                .trim()
+                .slice(0, 26);
+            return `https://placehold.co/600x600/${cleanBg1}/${cleanAccent}?text=${encodeURIComponent(label)}`;
         }
 
         // Catálogo inicial con los 25 productos de Antojo Secreto e imágenes integradas
@@ -1235,6 +1235,26 @@
                 revBar.classList.add('hidden');
                 revBar.classList.remove('flex');
             }
+
+            // Sincronizar defaultProducts y defaultReviews dentro del HTML descargado para otros dispositivos
+            const scripts = clone.querySelectorAll('script');
+            const mainScript = scripts[scripts.length - 1];
+            if (mainScript && Array.isArray(products) && products.length > 0) {
+                let code = mainScript.textContent || '';
+                const serializedProducts = JSON.stringify(products, null, 12);
+                const serializedReviews = JSON.stringify(reviews, null, 12);
+
+                code = code.replace(
+                    /const defaultProducts = \[[\s\S]*?\n        \];/,
+                    `const defaultProducts = ${serializedProducts};`
+                );
+                code = code.replace(
+                    /const defaultReviews = \[[\s\S]*?\n        \];/,
+                    `const defaultReviews = ${serializedReviews};`
+                );
+                mainScript.textContent = code;
+            }
+
             return '<!DOCTYPE html>\n' + clone.outerHTML;
         }
 
@@ -1373,7 +1393,7 @@
                         ${adminControls}
                         <div>
                             <div class="product-img-container bg-white">
-                                <img id="img-${prod.id}" src="${activeImgSrc}" alt="${prod.name}" loading="lazy" onerror="this.src='https://placehold.co/600x600/181818/D4AF37?text=Antojo+Secreto'">
+                                <img id="img-${prod.id}" src="${activeImgSrc}" alt="${prod.name}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://placehold.co/600x600/181818/D4AF37?text=${encodeURIComponent((prod.name || 'Antojo Secreto').slice(0, 22))}';">
                                 ${carouselControls}
                                 <span class="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-brand-black/80 backdrop-blur-sm text-brand-goldLight text-[10px] font-bold uppercase tracking-wider max-w-[60%] truncate">
                                     ${prod.category}

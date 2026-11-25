@@ -71,6 +71,8 @@
         .product-img-container {
             aspect-ratio: 1 / 1;
             overflow: hidden;
+            position: relative;
+        }
         .product-img-container img,
         .product-img-container canvas {
             width: 100%;
@@ -681,6 +683,11 @@
         ];
 
         let reviews = [];
+        let products = [];
+        let currentCategory = 'Todos';
+        let isAdminMode = false;
+        let activeSlideIndex = {};
+        let currentModalImages = [];
 
         function getInitials(name) {
             const parts = String(name || "AS").trim().split(/\s+/).filter(Boolean);
@@ -813,6 +820,20 @@
             const idx = reviews.findIndex(r => String(r.id) === String(reviewId));
             if (idx !== -1) reviews[idx] = payload;
             else reviews.unshift(payload);
+
+            saveReviewsToStorage();
+            renderReviews();
+            closeReviewModal();
+            showToast('Opinión guardada correctamente.');
+        }
+
+        function deleteReview(id) {
+            reviews = reviews.filter(r => String(r.id) !== String(id));
+            saveReviewsToStorage();
+            renderReviews();
+            showToast('Opinión eliminada.');
+        }
+
         // Generador de respaldo visual local en canvas compatible con todos los dispositivos
         function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
             try {
@@ -1066,25 +1087,26 @@
                 name: "Libros para Colorear Anti-Estrés",
                 category: "Anti-Estrés y Juegos",
                 price: "$10.000 c/u",
-                desc: "Estilos Line Art Tracing y Open at Your Own Risk (+5000 ilustraciones). Relaja tu mente, reduce el estrés y estimula la creatividad.",
-                image: makeProdArt("#1E293B", "#0F172A", "#FBBF24", "ART", "LIBROS ANTI-ESTRÉS", "LINE ART Y +5000 DIBUJOS")
-            },
-            {
-                id: "prod_23",
-                order: 23,
-                name: "Spinner Esfera Transformable",
-                category: "Anti-Estrés y Juegos",
-                price: "$10.000 c/u",
-                desc: "Gira, presiona y transforma. Juguete sensorial auto-rotativo ideal para mejorar la concentración y liberar estrés en niños y adultos.",
-                image: makeProdArt("#065F46", "#022C22", "#6EE7B7", "360", "SPINNER ESFERA 3D", "GIRA • PRESIONA • TRANSFORMA")
-            },
-            {
-                id: "prod_24",
-                order: 24,
-                name: "Squeeze Desestresantes Kawaii",
-                category: "Anti-Estrés y Juegos",
-                price: "Desde $2.000 hasta $12.000",
-                desc: "Suavecitos, estirables y divertidos. Ideales para apretar y liberar tensión en el estudio, oficina o como detalle tierno.",
+                {
+                    id: "prod_24",
+                    order: 24,
+                    name: "Squeeze Desestresantes Kawaii",
+                    category: "Anti-Estrés y Juegos",
+                    price: "Desde $2.000 hasta $12.000",
+                    desc: "Suavecitos, estirables y divertidos. Ideales para apretar y liberar tensión en el estudio, oficina o como detalle tierno.",
+                    image: makeProdArt("#831843", "#2E071B", "#F9A8D4", "SQUISH", "SQUEEZE KAWAII", "SUAVES Y ANTI-ESTRÉS")
+                },
+                {
+                    id: "prod_25",
+                    order: 25,
+                    name: "Mini Blocks Armables (Edición Halloween)",
+                    category: "Anti-Estrés y Juegos",
+                    price: "$8.000 c/u",
+                    desc: "Bloques de construcción tipo Lego (90 a 225 piezas) para armar figuras coleccionables (Fantasma, Calabaza, Casa Mágica).",
+                    image: makeProdArt("#311042", "#12051A", "#FB923C", "MINI", "MINI BLOCKS COLECCIÓN", "90 A 225 PIEZAS • ARMABLES")
+                }
+            ];
+
         // Generador local de identidad visual por producto (sin depender de servicios externos)
         function makeProdArt(bg1, bg2, accent, symbolText, badge, sub) {
             return JSON.stringify({
@@ -1166,6 +1188,63 @@
                 const spec = parseLocalArt(raw);
                 const title = canvas.getAttribute("data-prod-title") || "Antojo Secreto";
                 drawProductArtCanvas(canvas, spec, title);
+            });
+        }
+
+        function getProductImages(prod) {
+            if (!prod) {
+                return [makeProdArt("#181818", "#0D0D0D", "#D4AF37", "TOP", "ANTOJO SECRETO", "DETALLE ESPECIAL")];
+            }
+            if (Array.isArray(prod.images) && prod.images.length > 0) {
+                return prod.images.filter(Boolean);
+            }
+            if (prod.image) {
+                return [prod.image];
+            }
+            return [makeProdArt("#181818", "#0D0D0D", "#D4AF37", "TOP", String(prod.name || "ANTOJO SECRETO").slice(0, 24).toUpperCase(), String(prod.category || "DETALLE ESPECIAL").toUpperCase())];
+        }
+
+        function saveCatalogToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+            } catch (e) {
+                console.warn("No se pudo guardar el catálogo en localStorage:", e);
+            }
+        }
+
+        function loadCatalog() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        products = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("No se pudo leer el catálogo guardado:", e);
+            }
+            products = JSON.parse(JSON.stringify(defaultProducts));
+            saveCatalogToStorage();
+        }
+
+        function updateCategoryCounts() {
+            const countAll = document.getElementById('count-all');
+            if (countAll) {
+                countAll.textContent = String(products.length);
+            }
+        }
+
+        function updateActiveCategoryButtons() {
+            document.querySelectorAll('.cat-btn').forEach((btn) => {
+                const isSelected = btn.getAttribute('data-cat') === currentCategory;
+                btn.classList.toggle('active', isSelected);
+                btn.classList.toggle('bg-brand-black', isSelected);
+                btn.classList.toggle('text-brand-gold', isSelected);
+                btn.classList.toggle('shadow-sm', isSelected);
+                btn.classList.toggle('bg-brand-cream', !isSelected);
+                btn.classList.toggle('text-gray-700', !isSelected);
             });
         }
 
